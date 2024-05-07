@@ -549,51 +549,7 @@
 </SfDialog>
 <!--for dbcontext storing-->
 @code{
-    TrademarkInformation TrademarkInfo { get; set; } = new TrademarkInformation();
-    MarkType SelectedMarkType { get; set; }
-
-    ClaimConventionProperty CCPInfo { get; set; } = new ClaimConventionProperty();
-
-
-    ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
-
-
-    private async Task SaveInfo()
-    {
-        TrademarkInfo.MarkType = SelectedMarkType.ToString();
-
-        // Add the objects to the DbContext
-        _dbContext.TrademarkInformation.Add(TrademarkInfo);
-        if (isChecked)
-        {
-            _dbContext.ClaimConventionProperty.Add(CCPInfo);
-            await _dbContext.SaveChangesAsync();
-            CCPInfo = new ClaimConventionProperty();
-        }
-        _dbContext.ResidentAgentInformation.Add(AgentInfo);
-        
-
-        // Save changes to the database
-        await _dbContext.SaveChangesAsync();
-
-        // Optionally, you can reset the objects for a new entry
-        TrademarkInfo = new TrademarkInformation();
-        AgentInfo = new ResidentAgentInformation();
-    }
-
-    private List<Countries> countriesinformation = new List<Countries>();
-    private void RetrievedCountries()
-    {
-        countriesinformation = _countriesrepository.GetCountries();
-    }
-
-    protected override void OnInitialized()
-    {
-        //RetrievedNationalities();
-        RetrievedCountries();
-        //RetrievedStates();
-        //RetrievedCities();
-    }
+    
 }
 
 <!--tm sections: trademark information, goods and services, applicant information, and resident agent information-->
@@ -664,6 +620,49 @@
 
 <!--mark type conditions and selections-->
 @code {
+    TrademarkInformation TrademarkInfo { get; set; } = new TrademarkInformation();
+    ClaimConventionProperty CCPInfo { get; set; } = new ClaimConventionProperty();
+
+
+    ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
+
+
+    private async Task SaveInfo()
+    {
+        TrademarkInfo.MarkType = selectedMarkType.ToString();
+
+        // Add the objects to the DbContext
+        _dbContext.TrademarkInformation.Add(TrademarkInfo);
+        if (isChecked)
+        {
+            _dbContext.ClaimConventionProperty.Add(CCPInfo);
+            await _dbContext.SaveChangesAsync();
+            CCPInfo = new ClaimConventionProperty();
+        }
+        _dbContext.ResidentAgentInformation.Add(AgentInfo);
+
+
+        // Save changes to the database
+        await _dbContext.SaveChangesAsync();
+
+        // Optionally, you can reset the objects for a new entry
+        TrademarkInfo = new TrademarkInformation();
+        AgentInfo = new ResidentAgentInformation();
+    }
+
+    private List<Countries> countriesinformation = new List<Countries>();
+    private void RetrievedCountries()
+    {
+        countriesinformation = _countriesrepository.GetCountries();
+    }
+
+    protected override void OnInitialized()
+    {
+        //RetrievedNationalities();
+        RetrievedCountries();
+        //RetrievedStates();
+        //RetrievedCities();
+    }
 
     public MarkType? selectedMarkType = null;
 
