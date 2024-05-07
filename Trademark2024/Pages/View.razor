@@ -1,0 +1,36 @@
+﻿@page "/view"
+@using Trademark2024.Data
+@using Microsoft.EntityFrameworkCore;
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.Generic
+
+@inject AppDbContext _dbContext
+@inject NavigationManager NavigationManager
+@inject ITrademarkInformationRepository _trademarkInformationRepository
+@inject IApplicantInformationRepository _applicantInformationRepository
+
+@inject ICountriesRepository _countriesrepository
+@inject IStatesRepository _statesrepository
+@inject ICitiesRepository _citiesrepository
+@inject INationalitiesRepository _nationalityrepository
+
+@foreach (var states in statesinformation)
+{
+    <tr>
+        <td>@states.Id</td>
+        <td>@states.CountryId</td>
+        <td>@states.StateName</td>
+    </tr>
+}
+
+@code{
+    private List<States> statesinformation;
+    private void RetrievedStates()
+    {
+        statesinformation = _statesrepository.GetStates();
+    }
+    protected override void OnInitialized()
+    {
+        RetrievedStates();
+    }
+}

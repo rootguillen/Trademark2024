@@ -1,0 +1,92 @@
+﻿@page "/tm"
+@using Trademark2024.Data
+@using Microsoft.EntityFrameworkCore;
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.Generic
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Inputs
+@using System.ComponentModel.DataAnnotations
+@using System.Threading.Tasks
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.SplitButtons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Popups
+
+@inject AppDbContext _dbContext
+@inject NavigationManager NavigationManager
+@inject ITrademarkInformationRepository _trademarkInformationRepository
+@inject IApplicantInformationRepository _applicantInformationRepository
+
+@inject ICountriesRepository _countriesrepository
+@inject IStatesRepository _statesrepository
+@inject ICitiesRepository _citiesrepository
+@inject INationalitiesRepository _nationalityrepository
+
+<PageTitle>TM List DB Conn</PageTitle>
+<div class="row">
+    
+    <!--Nationalities Dropdown List-->
+    <div class="row">
+        <SfDropDownList TValue="Nationalities" TItem="Nationalities" Placeholder="Select Nationality" DataSource="@nationalityinformation" TValueExpression="(Func<Nationality, int>)(e => e.num_code)"
+                        TextExpression="(Func<Nationality, string>)(e => e.nationality)">
+            <DropDownListFieldSettings Text="nationality" Value="num_code"></DropDownListFieldSettings>
+        </SfDropDownList>
+    </div>
+
+    <!--Countries Dropdown List-->
+    <div class="row pt-3">
+        <SfDropDownList TValue="Countries" TItem="Countries" Placeholder="Select Country of Residence" DataSource="@countriesinformation" TValueExpression="(Func<Countries, int>)(e => e.Id)"
+                        TextExpression="(Func<Countries, string>)(e => e.countries)">
+            <DropDownListFieldSettings Text="CountryName" Value="Id"></DropDownListFieldSettings>
+        </SfDropDownList>
+    </div>
+    <!--States -->
+    <div class="row pt-1">
+        <SfDropDownList TValue="States" TItem="States" Placeholder="Select a State" DataSource="@statesinformation" TValueExpression="(Func<States, int>)(e => e.Id)"
+                        TextExpression="(Func<States, string>)(e => e.states)">
+            <DropDownListFieldSettings Text="StateName" Value="Id"></DropDownListFieldSettings>
+        </SfDropDownList>
+    </div>
+    <!--Cities-->
+    <div class="row pt-1">
+        <SfDropDownList TValue="Cities" TItem="Cities" Placeholder="Select a City" DataSource="@citiesinformation" TValueExpression="(Func<Cities, int>)(e => e.Id)"
+                        TextExpression="(Func<Cities, string>)(e => e.cities)">
+            <DropDownListFieldSettings Text="CityName" Value="Id"></DropDownListFieldSettings>
+        </SfDropDownList>
+    </div>
+</div>
+
+@code {
+    private List<Countries> countriesinformation = new List<Countries>();
+    private void RetrievedCountries()
+    {
+        countriesinformation = _countriesrepository.GetCountries();
+    }
+
+    private List<States> statesinformation = new List<States>();
+    private void RetrievedStates()
+    {
+        statesinformation = _statesrepository.GetStates();
+    }
+    
+    private List<Cities> citiesinformation = new List<Cities>();
+    private void RetrievedCities()
+    {
+        countriesinformation = _countriesrepository.GetCountries();
+    }
+    
+    private List<Nationalities> nationalityinformation = new List<Nationalities>();
+    private void RetrievedNationalities()
+    {
+        nationalityinformation = _nationalityrepository.GetNationalities();
+    }
+
+    protected override void OnInitialized()
+    {
+        RetrievedNationalities();
+        RetrievedCountries();
+        //RetrievedStates();
+        RetrievedCities();
+    }
+}

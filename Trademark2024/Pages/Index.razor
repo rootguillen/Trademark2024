@@ -1,0 +1,720 @@
+﻿@page "/"
+@using Trademark2024.Data
+@using Trademark2024.Services
+
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.Generic
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Inputs
+@using System.ComponentModel.DataAnnotations
+@using System.Threading.Tasks
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.SplitButtons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Popups
+
+@inject NavigationManager NavigationManager
+@inject ITrademarkInformationRepository _trademarkInformationRepository
+@inject IApplicantInformationRepository _applicantInformationRepository
+@inject IStatesRepository _statesrepository
+@inject ICountriesRepository _countriesrepository
+
+@inject ICitiesRepository _citiesrepository
+@inject INationalitiesRepository _nationalityrepository
+
+<PageTitle>Trademark - Trademark Application</PageTitle>
+<div class="row pt-3">
+    <div class="col-10 container-fluid d-flex">
+            <div class="card card-main shadow">
+                <div class="card-header title-tm">
+                    TRADEMARK APPLICATION - IPOPHL Form 400
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="row">
+                            @foreach (var button in buttons)
+                            {
+                                <div class="col-3">
+                                    <button type="button"
+                                            @onclick="() => ActivateButton(button)"
+                                            class="btn shadow p-3 mb-5 rounded @(button.IsActive ? "active" : "") d-flex justify-content-center">
+                                        <div class="tmsection">@button.Label</div>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (infoTrademark)
+                    {
+                        //type of mark
+                        <div class="row d-flex">
+                            <div class="tm-info-tle1">TRADEMARK INFORMATION</div>
+                            <div class="subtitle pt-1">Type of Mark</div>
+                            <div class="fst-italic subtext">
+                                Kindly specify what type of Mark are you applying for:
+                            </div>
+                            <div class="row d-flex justify-content-center">
+                            @foreach (Trademark2024.Shared.Enum.MarkType markType in Enum.GetValues(typeof(Trademark2024.Shared.Enum.MarkType)))
+                                {
+                                @if (markType != Trademark2024.Shared.Enum.MarkType.None)
+                                    {
+                                        <div class="col-2 pt-2">
+                                            <button class="@GetButtonClass(markType) marktype-button shadow p-3 mb-5 rounded"
+                                                    @onclick="() => SelectMarkType(markType)">
+                                                <div class="row">
+                                                    <div class="card-img">
+                                                        <img class="img-tm d-inline-block align-text-top"
+                                                             src="@GetMarkTypeImagePath(markType)"
+                                                             alt="@GetMarkTypeAltText(markType)"
+                                                             loading="lazy" />
+                                                    </div>
+                                                    <div class="@GetTypeTitleClass(markType)">@GetMarkTypeTitle(markType)</div>
+                                                    <div class="@GetTypeTextClass(markType)">@GetMarkTypeDescription(markType)</div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+
+                        </div> <!--end div for type of mark-->
+                        <!--Trademark Information-->
+                        @if (selectedMarkType.HasValue )
+                        {
+                            <div class="row pt-3">
+                                <div class="row">
+                                    <div class="col form-txt text-end">
+                                        <label for="checked" class="me-2">Claiming convention priority?</label>
+                                        <SfSwitch @bind-Checked="isChecked"></SfSwitch>
+                                    </div>
+
+                                    @code {
+                                        private bool isChecked = false;
+                                    }
+                                </div><!--end of claim of convention property yes/no-->
+                            </div>
+                            <div class="row">
+                                <div class="form-txt">
+                                    <div class="row">
+                                        <div class="col form-floating mb-2">
+                                            <InputText placeholder="Title of the Mark" class="form-control" id="markTitle" required />
+                                            <label class="ms-2" for="markTitle">Title of the Mark</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col form-floating mb-2">
+                                            <InputText placeholder="Claim of Colors (ex. #ffffff, #000000)" class="form-control" id="claimColors" required />
+                                            <label class="ms-2" for="claimColors">Claim of Colors (ex. #ffffff, #000000)</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col form-floating mb-2">
+                                            <InputText placeholder="Translation/Transliteration" class="form-control" id="translation" required />
+                                            <label class="ms-2" for="translation">Translation/Transliteration</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col form-floating mb-2">
+                                            <InputText placeholder="Disclaimer" class="form-control" id="claimColors" required />
+                                            <label class="ms-2" for="claimColors">Disclaimer</label>
+                                        </div>
+                                    </div>
+                                    <div class="row ps-2 pe-2">
+                                        <div class="card">
+                                            @if (isChecked)
+                                            {
+                                                <div class="row p-3">
+                                                    <div class="row">
+                                                        <div class="form-floating ms-2 me-2 mt-2 form-txt">
+                                                            <SfTextBox Placeholder="Prior Foreign Application No." FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-floating ms-2 me-2 mt-2 form-txt">
+                                                            <SfDatePicker TValue="DateTime?" Placeholder="Foreign Filing Date"></SfDatePicker>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <SfDropDownList TValue="Countries" TItem="Countries" Placeholder="Select Country of Residence" DataSource="@countriesinformation" TValueExpression="(Func<Countries, int>)(e => e.Id)"
+                                                                        TextExpression="(Func<Countries, string>)(e => e.countries)">
+                                                            <DropDownListFieldSettings Text="CountryName" Value="Id"></DropDownListFieldSettings>
+                                                        </SfDropDownList>
+                                                    </div>
+                                                </div>
+                                                @foreach (var priority in claimingConventionPriorities)
+                                                {
+                                                    <div class="row p-3">
+                                                        <div class="row">
+                                                            <div class="form-floating ms-2 me-2 mt-2">
+                                                                <SfTextBox Placeholder="Prior Foreign Application No." FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-floating ms-2 me-2 mt-2">
+                                                                <SfDatePicker TValue="DateTime?" Placeholder="Foreign Filing Date"></SfDatePicker>
+                                                            </div>
+                                                        </div>
+                                                    <div class="row">
+                                                        <SfDropDownList TValue="Countries" TItem="Countries" Placeholder="Select Country of Residence" DataSource="@countriesinformation" TValueExpression="(Func<Countries, int>)(e => e.Id)"
+                                                                        TextExpression="(Func<Countries, string>)(e => e.countries)">
+                                                            <DropDownListFieldSettings Text="CountryName" Value="Id"></DropDownListFieldSettings>
+                                                        </SfDropDownList>
+                                                    </div>
+                                                    </div>
+                                                }
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-floating m-2">
+                                                            <button class="btn btn-primary" @onclick="AddBatch">+</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @code {
+                                                    private List<ClaimingConventionPriority> claimingConventionPriorities = new List<ClaimingConventionPriority>();
+                                                    public class ClaimingConventionPriority
+                                                    {
+                                                        public string PriorForeignApplicationNo { get; set; }
+                                                        public DateTime? DateValue { get; set; }
+                                                    }
+                                                    private void AddBatch()
+                                                    {
+                                                        claimingConventionPriorities.Add(new ClaimingConventionPriority());
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> <!--end of Trademark Information-->
+                        }
+                    }
+                    else if (goodsServices )
+                    {
+                        //Goods and Services
+                        <div class="row d-flex">
+                            <div class="row d-flex">
+                                <div class="tm-info-tle2">GOODS AND SERVICES</div>
+                            </div>
+                            <!--
+                           @foreach (var classEntry in ClassEntries)
+                            {
+                                <div class="row p-3">
+                                    <div class="row">
+                                        <SfDropDownList @bind-Value="@trademarkModel.goodsServicesInformation.NClass" TValue="string" TItem="ClassDataModel" PopupHeight="auto"
+                                                        PopupWidth="auto" Placeholder="Nice Class" DataSource="@ClassListModel">
+                                            <DropDownListFieldSettings Value="classEntry.ClassId Text="classEntry.ClassName"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                    </div>
+                                    <div class="row">
+                                        <SfTextBox Placeholder="Terms" FloatLabelType="@FloatLabelType.Auto" @bind-Value="@trademarkModel.goodsServicesInformation.GSComments"></SfTextBox>
+                                        <ValidationMessage For="@(() => trademarkModel.goodsServicesInformation.GSComments)" />
+                                    </div>
+                                </div>
+                            }
+                            <div class="row pt-2">
+                                <button class="btn add-class-button" @onclick="AddClassEntry">Add Class</button>
+                            </div>
+                            -->
+                           
+                        </div>
+
+                        <!--end of Goods and Services-->
+                    }
+                    else if (applicantInfo )
+                    {
+                        <!--Applicant Information-->
+                        <div class="row d-flex">
+                            <div class="row d-flex">
+                                <div class="row tm-info-tle1">APPLICANT INFORMATION</div>
+                            </div>
+                            <div class="row pt-2">
+                                <div class="col-4">
+                                    <label class="label-typeApplicant">What type of applicant are you?</label>
+                                </div>
+                                <div class="col-2 form-txt"><SfRadioButton Label="Individual" Name="applicantType" CssClass="e-primary" Value="Individual" @bind-Checked="stringChecked" @onclick="() => ToggleApplicantType(true)"></SfRadioButton></div>
+                                <div class="col-2 form-txt"><SfRadioButton Label="Company / Corporation" Name="applicantType" CssClass="e-primary" Value="Company / Corporation" @bind-Checked="stringChecked" @onclick="() => ToggleApplicantType(false)"></SfRadioButton></div>
+                                <div class="col-2 form-txt"><SfRadioButton Label="School" Name="applicantType" CssClass="e-primary" Value="School" @bind-Checked="stringChecked" @onclick="() => ToggleApplicantType(false)"></SfRadioButton></div>
+                                <div class="col-2 form-txt"><SfRadioButton Label="Government" Name="applicantType" CssClass="e-primary" Value="Government" @bind-Checked="stringChecked" @onclick="() => ToggleApplicantType(false)"></SfRadioButton></div>
+                            </div>
+                            <div class="row pt-1">
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="Last Name" class="form-control" id="applicantLName" required />
+                                        <label for="applicantFName">Last Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="First Name" class="form-control" id="applicantFName" required />
+                                        <label for="applicantFName">First Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="Middle Name" class="form-control" id="applicantMName" required />
+                                        <label for="applicantMName">Middle Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-1 mt-2 form-txt">Sex</div>
+                                <div class="form-txt col-2 mt-2">
+                                    <!--gender select-->
+                                </div>
+                            </div>
+                            <div class="row pt-1">
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="Applicant Position" class="form-control" id="applicantPosition"
+                                                   disabled="@isIndividualSelected" />
+                                        <label for="applicantPosition">Applicant Position</label>
+                                    </div>
+                                </div>
+                                <div class="col-7">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="Name of Company / Corporation / Government Agency / School" class="form-control" id="nameCompanyCorpGovASch"
+                                                   disabled="@isIndividualSelected" />
+                                        <label for="nameCompanyCorpGovASch">Name of Company / Corporation / Government Agency / School</label>
+                                    </div>
+                                </div>
+                                <div class="col-2 mt-2 form-txt">
+                                    <SfDropDownButton Content="Company Entity Type" class="form-txt" disabled="@isIndividualSelected">
+                                        <DropDownMenuItems>
+                                            <DropDownMenuItem Text="Big Entity"></DropDownMenuItem>
+                                            <DropDownMenuItem Text="Small Entity"></DropDownMenuItem>
+                                        </DropDownMenuItems>
+                                    </SfDropDownButton>
+                                </div>
+                            </div>
+                            <div class="row pt-1">
+                                <div class="col">Complete Address</div>
+                                <div class="row">
+                                    <div class="col-5 mt-2">
+                                        <div class="form-floating form-txt mb-2">
+                                            <InputText placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control" id="applicantAddress" required />
+                                            <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
+                                        </div>
+                                    </div>
+                                    <!--country, city, state-->
+                                    
+                                    <div class="col-1 mt-2">
+                                        <div class="form-floating form-txt mb-2">
+                                            <InputText placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
+                                            <label for="applicantZipCode">Zip Code</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group mt-2 mb-3">
+                                        <span class="input-group-text" id="phone-icon">
+                                            <i class="bi bi-telephone-fill"></i>
+                                        </span>
+                                        <InputText placeholder="Mobile Number" class="form-control form-txt" id="raMobNum" required />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mt-2 mb-3">
+                                        <span class="input-group-text" id="email-icon">
+                                            <i class="bi bi-envelope-fill"></i>
+                                        </span>
+                                        <InputText placeholder="Email Address" class="form-control form-txt" id="raEmailAdd" required />
+                                    </div>
+                                </div>
+                                <div class="col mt-2">
+                                    <div class="form-floating form-txt mb-2">
+                                        <SfDropDownList TValue="Nationalities" TItem="Nationalities" Placeholder="Select Nationality" DataSource="@nationalityinformation" TValueExpression="(Func<Nationality, int>)(e => e.num_code)"
+                                                        TextExpression="(Func<Nationality, string>)(e => e.nationality)" @bind-Value="@selectedApplicantNationality">
+                                            <DropDownListFieldSettings Text="nationality" Value="num_code"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!--end of applicant information-->
+                    }
+                    else if (residentAgent )
+                    {
+                        <!--RESIDENT AGENT / AUTHORIZED REPRESENTATIVE-->
+                        <div class="row d-flex">
+                            <div class="tm-info-tle2">RESIDENT AGENT / AUTHORIZED REPRESENTATIVE</div>
+                            <div class="row">
+                                <div class="col">
+                                </div>
+                            </div>
+
+                            <div class="row pt-1">
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="Last Name" class="form-control" id="raFName" required />
+                                        <label for="raFName">Last Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="First Name" class="form-control" id="raFName" required />
+                                        <label for="raFName">First Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText placeholder="Middle Name" class="form-control" id="raMName" required />
+                                        <label for="raMName">Middle Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-1 mt-2 form-txt">Sex</div>
+                                <div class="form-txt col-2 mt-2">
+                                    <!--gender select-->
+                                </div>
+                            </div>
+                            <div class="row pt-1">
+                                <div class="col">Complete Address</div>
+                                <div class="row">
+                                    <div class="col-5 mt-2">
+                                        <div class="form-floating form-txt mb-2 text-wrap">
+                                            <InputText placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control form-txt" id="applicantAddress" required />
+                                            <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
+                                        </div>
+                                    </div>
+                                    <!--country, city, state-->
+                                    
+                                    <div class="col mt-2">
+                                        <div class="form-floating form-txt mb-2">
+                                            <InputText placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
+                                            <label for="applicantZipCode">Zip Code</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group mt-2 mb-3">
+                                        <span class="input-group-text" id="phone-icon">
+                                            <i class="bi bi-telephone-fill"></i>
+                                        </span>
+                                        <InputText placeholder="Mobile Number" class="form-control form-txt" id="raMobNum" required />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mt-2 mb-3">
+                                        <span class="input-group-text" id="email-icon">
+                                            <i class="bi bi-envelope-fill"></i>
+                                        </span>
+                                        <InputText placeholder="Email Address" class="form-control form-txt" id="raEmailAdd" required />
+                                    </div>
+                                </div>
+                                <div class="col mt-2">
+                                    <div class="form-floating form-txt mb-2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--end of resident agent-->
+
+                        <div class="card-footer footer-tm">
+                            <SfButton CssClass="e-outline" @onclick="@OpenOuterDialog">Submit for preview</SfButton>
+                        </div>
+                    }
+                </div>
+            </div>
+    </div>
+
+</div>
+
+<!--tm sections: trademark information, goods and services, applicant information, and resident agent information-->
+@code {
+    private bool infoTrademark = false;
+    private bool applicantInfo = false;
+    private bool residentAgent = false;
+    private bool goodsServices = false;
+
+    private void InfoTrademark()
+    {
+        infoTrademark = true;
+        applicantInfo = false;
+        residentAgent = false;
+        goodsServices = false;
+    }
+    private void ApplicantInfo()
+    {
+        infoTrademark = false;
+        applicantInfo = true;
+        residentAgent = false;
+        goodsServices = false;
+    }
+    private void ResidentAgent()
+    {
+        infoTrademark = false;
+        applicantInfo = false;
+        residentAgent = true;
+        goodsServices = false;
+    }
+    private void GoodsServices()
+    {
+        infoTrademark = false;
+        applicantInfo = false;
+        residentAgent = false;
+        goodsServices = true;
+
+        ActivateButton(buttons.FirstOrDefault(b => b.Label == "Goods and Services"));
+    }
+
+    public class ButtonInfo
+    {
+        public string Label { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+    private List<ButtonInfo> buttons = new List<ButtonInfo>
+    {
+        new ButtonInfo { Label = "Trademark Information"},
+        new ButtonInfo { Label = "Goods and Services"},
+        new ButtonInfo { Label = "Applicant Information"},
+        new ButtonInfo { Label = "Resident Agent/ Authorized Representative" }
+    };
+
+    private void ActivateButton(ButtonInfo selectedButton)
+    {
+        foreach (var button in buttons)
+        {
+            button.IsActive = (button == selectedButton);
+        }
+
+        infoTrademark = selectedButton.Label == "Trademark Information";
+        applicantInfo = selectedButton.Label == "Applicant Information";
+        residentAgent = selectedButton.Label == "Resident Agent/ Authorized Representative";
+        goodsServices = selectedButton.Label == "Goods and Services";
+    }
+}
+
+<!--mark type conditions and selections-->
+@code {
+
+    public Trademark2024.Shared.Enum.MarkType? selectedMarkType = null;
+
+
+    private void SelectMarkType(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        if (selectedMarkType == markType)
+        {
+            selectedMarkType = null;
+        }
+        else
+        {
+            selectedMarkType = markType;
+        }
+    }
+
+    private string GetButtonClass(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        if (selectedMarkType == markType)
+        {
+            return "btn btn-dark";
+        }
+        else
+        {
+            return "btn btn-light";
+        }
+
+    }
+
+    private string GetTypeTitleClass(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        return selectedMarkType == markType ? "type-title dark-text" : "type-title light-text";
+    }
+
+    private string GetTypeTextClass(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        return selectedMarkType == markType ? "type-text dark-text" : "type-text light-text";
+    }
+
+    private string GetMarkTypeImagePath(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        if (markType == Trademark2024.Shared.Enum.MarkType.None)
+        {
+            return "";
+        }
+        else
+        {
+            string imageName = "";
+
+            switch (markType)
+            {
+                case Trademark2024.Shared.Enum.MarkType.Word:
+                    imageName = "tm-wm.png";
+                    break;
+                case Trademark2024.Shared.Enum.MarkType.Figurative:
+                    imageName = "tm-fm.png";
+                    break;
+                case Trademark2024.Shared.Enum.MarkType.FigurativeWithWord:
+                    imageName = "tm-fwm.png";
+                    break;
+                case Trademark2024.Shared.Enum.MarkType.ThreeD:
+                    imageName = "tm-dm.png";
+                    break;
+                case Trademark2024.Shared.Enum.MarkType.Collective:
+                    imageName = "tm-cm.png";
+                    break;
+            }
+            return $"regisForm-img/{imageName}";
+        }
+
+    }
+
+    private string GetMarkTypeAltText(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        return markType == Trademark2024.Shared.Enum.MarkType.None ? "" : markType.ToString();
+    }
+
+    private string GetMarkTypeTitle(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        if (markType == Trademark2024.Shared.Enum.MarkType.None)
+        {
+            return markType == Trademark2024.Shared.Enum.MarkType.None ? "" : markType.ToString();
+        }
+        else
+        {
+            switch (markType)
+            {
+                case Trademark2024.Shared.Enum.MarkType.Word:
+                    return "Word Mark";
+                case Trademark2024.Shared.Enum.MarkType.Figurative:
+                    return "Figurative Mark";
+                case Trademark2024.Shared.Enum.MarkType.FigurativeWithWord:
+                    return "Figurative with Word Mark";
+                case Trademark2024.Shared.Enum.MarkType.ThreeD:
+                    return "3D Mark";
+                case Trademark2024.Shared.Enum.MarkType.Collective:
+                    return "Collective Mark";
+                default:
+                    return string.Empty;
+            }
+        }
+
+    }
+
+    private string GetMarkTypeDescription(Trademark2024.Shared.Enum.MarkType markType)
+    {
+        if (markType == Trademark2024.Shared.Enum.MarkType.None)
+        {
+            return markType == Trademark2024.Shared.Enum.MarkType.None ? "" : markType.ToString();
+        }
+        else
+        {
+            switch (markType)
+            {
+                case Trademark2024.Shared.Enum.MarkType.Word:
+                    return "A word mark consists solely of words, letters, or numbers without any design elements.";
+                case Trademark2024.Shared.Enum.MarkType.Figurative:
+                    return "A figurative mark includes designs, graphics, symbols, or images.";
+                case Trademark2024.Shared.Enum.MarkType.FigurativeWithWord:
+                    return "A combination of figurative and word mark.";
+                case Trademark2024.Shared.Enum.MarkType.ThreeD:
+                    return "A three-dimensional representation used as a trademark.";
+                case Trademark2024.Shared.Enum.MarkType.Collective:
+                    return "A trademark owned by an organization used by its members to identify with a level of quality.";
+                default:
+                    return string.Empty;
+            }
+        }
+    }
+}
+
+<!--for type of applicant; able/disable-->
+@code {
+    private string stringChecked = "Individual";
+    bool isIndividualSelected = false;
+    void ToggleApplicantType(bool isIndividual)
+    {
+        isIndividualSelected = isIndividual;
+    }
+}
+
+<!--for image upload; tm img files-->
+@code {
+
+    private void onFileSelect(SelectedEventArgs args)
+    {
+        args.CurrentRequest = new List<object> { new { Authorization = "test123" } };
+    }
+
+    private void onRemove(BeforeRemoveEventArgs args)
+    {
+        args.CurrentRequest = new List<object> { new { Authorization = "test123" } };
+    }
+
+}
+
+<!--for repo dropdown populate-->
+@code {
+    private List<TrademarkInformation> tminformation;
+    private void RetrievedTM()
+    {
+        tminformation = _trademarkInformationRepository.GetTrademarkInformation();
+    }
+
+    private List<Countries> countriesinformation = new List<Countries>();
+    private void RetrievedCountries()
+    {
+        countriesinformation = _countriesrepository.GetCountries();
+    }
+    private List<States> statesinformation = new List<States>();
+    private void RetrievedStates()
+    {
+        statesinformation = _statesrepository.GetStates();
+    }
+    private List<Cities> citiesinformation = new List<Cities>();
+    private void RetrievedCities()
+    {
+        countriesinformation = _countriesrepository.GetCountries();
+    }
+    private List<Nationalities> nationalityinformation = new List<Nationalities>();
+    private void RetrievedNationalities()
+    {
+        nationalityinformation = _nationalityrepository.GetNationalities();
+    }
+
+    protected override void OnInitialized()
+    {
+        RetrievedTM();
+        RetrievedNationalities();
+        RetrievedCountries();
+
+        RetrievedCities();
+    }
+
+    private Nationalities selectedApplicantNationality;
+    private ApplicantInformation applicantInformation = new ApplicantInformation();
+    private void SaveSelectedNationality()
+    {
+        applicantInformation.ApplicantNationality = selectedApplicantNationality?.nationality;
+    }
+}
+
+<!--//for submit preview button with modal-->
+@code{
+    
+    private bool IsOuterDialogVisible { get; set; } = false;
+    private bool IsInnerDialogVisible { get; set; } = false;
+    private void OpenOuterDialog()
+    {
+        IsOuterDialogVisible = true;
+    }
+
+    private void OpenInnerDialog()
+    {
+        IsInnerDialogVisible = true;
+    }
+
+    private void CloseInnerDialog()
+    {
+        IsOuterDialogVisible = false;
+        IsInnerDialogVisible = false;
+    }
+}
+
+
