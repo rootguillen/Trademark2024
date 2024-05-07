@@ -15,8 +15,8 @@ builder.Services.AddSyncfusionBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<ITrademarkInformationRepository, TrademarkInformationRepository>();
 builder.Services.AddScoped<IApplicantInformationRepository, ApplicantInformationRepository>();
-//builder.Services.AddScoped<IResidentAgentInformationRepository, ResidentAgentInformationRepository>();
-//builder.Services.AddScoped<IClaimConventionPropertyRepository, ClaimConventionPropertyRepository>();'
+builder.Services.AddScoped<IResidentAgentInformationRepository, ResidentAgentInformationRepository>();
+builder.Services.AddScoped<IClaimConventionPropertyRepository, ClaimConventionPropertyRepository>();
 
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 builder.Services.AddScoped<IStatesRepository, StatesRepository>();

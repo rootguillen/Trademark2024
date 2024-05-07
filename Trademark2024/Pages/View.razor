@@ -4,33 +4,86 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Collections.Generic
 
+@using Trademark2024.Data
+@using Trademark2024.Services
+@using Trademark2024.Shared.Enum
+
+@inject AppDbContext dbContext
+@inject HttpClient Http
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.Generic
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.Inputs
+@using System.ComponentModel.DataAnnotations
+@using System.Threading.Tasks
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.SplitButtons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Popups
+
 @inject AppDbContext _dbContext
 @inject NavigationManager NavigationManager
 @inject ITrademarkInformationRepository _trademarkInformationRepository
 @inject IApplicantInformationRepository _applicantInformationRepository
-
+@inject IResidentAgentInformationRepository _residentagentinformationRepository
 @inject ICountriesRepository _countriesrepository
 @inject IStatesRepository _statesrepository
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
 
-@foreach (var states in statesinformation)
+@foreach (var tm in trademarkinformation)
 {
     <tr>
-        <td>@states.Id</td>
-        <td>@states.CountryId</td>
-        <td>@states.StateName</td>
+        <td>@tm.TrademarkinformationID</td>
+        <td>@tm.Title</td>
+        <td>@tm.MarkType</td>
+        <td>@tm.ClaimColors</td>
+        <td>@tm.TranslationTransliteration</td>
+        <td>@tm.Disclaimer</td>
     </tr>
 }
 
 @code{
-    private List<States> statesinformation;
-    private void RetrievedStates()
+    private List<TrademarkInformation> trademarkinformation;
+    private void RetrievedTrademarkInformation()
     {
-        statesinformation = _statesrepository.GetStates();
+        trademarkinformation = _trademarkInformationRepository.GetTrademarkInformation();
     }
+    private List<ResidentAgentInformation> residentAgentInformation;
+    private void RetrievedAgentInformation()
+    {
+        residentAgentInformation = _residentagentinformationRepository.GetAgentInformation();
+    }
+
     protected override void OnInitialized()
     {
-        RetrievedStates();
+        RetrievedTrademarkInformation();
     }
+
+}
+@code {
+    TrademarkInformation TrademarkInfo { get; set; } = new TrademarkInformation();
+    //ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
+    MarkType SelectedMarkType { get; set; } = MarkType.None;
+
+    private async Task SaveInfo()
+    {
+        TrademarkInfo.MarkType = SelectedMarkType.ToString();
+
+        // Add the objects to the DbContext
+        _dbContext.TrademarkInformation.Add(TrademarkInfo);
+        //_dbContext.ResidentAgentInformation.Add(AgentInfo);
+
+        // Save changes to the database
+        await _dbContext.SaveChangesAsync();
+
+        // Optionally, you can reset the objects for a new entry
+        TrademarkInfo = new TrademarkInformation();
+        //AgentInfo = new ResidentAgentInformation();
+    }
+
+
 }
