@@ -29,6 +29,9 @@
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
 
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+
 <PageTitle>Trademark - Trademark Application</PageTitle>
 
 <div class="row pt-3">
@@ -548,10 +551,6 @@
     </DialogTemplates>
 </SfDialog>
 <!--for dbcontext storing-->
-@code{
-    
-}
-
 <!--tm sections: trademark information, goods and services, applicant information, and resident agent information-->
 @code {
     private bool infoTrademark = false;
@@ -629,6 +628,10 @@
 
     private async Task SaveInfo()
     {
+        // Close the modals
+        IsInnerDialogVisible = false;
+        IsOuterDialogVisible = false;
+
         TrademarkInfo.MarkType = selectedMarkType.ToString();
 
         // Add the objects to the DbContext
