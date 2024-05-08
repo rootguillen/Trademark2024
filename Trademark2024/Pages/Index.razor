@@ -29,6 +29,9 @@
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
 
+@inject IGoodsClassRepository _goodsclassrepository
+@inject IServicesClassRepository _servicesclassrepository
+
 @inject IJSRuntime jsRuntime
 @inject NavigationManager NavigationManager
 
@@ -200,10 +203,20 @@
                         <div class="row d-flex">
                             <div class="row d-flex">
                                 <div class="tm-info-tle2">GOODS AND SERVICES</div>
-                                </div>
-                                    
+                            </div>
+                            <div class="row pt-2">
+                                <SfMultiSelect TValue="string" TItem="ServicesClass" Placeholder="Select (Services) Class" DataSource="@servicesinformation" TValueExpression="(Func<ServicesClass, int>)(e => e.ServicesId)"
+                                                        TextExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)" EnableGroupCheckBox="true">
+                                                            <MultiSelectFieldSettings Text="ServicesClassItem" Value="ServicesId"></MultiSelectFieldSettings>
+                                </SfMultiSelect>
+                            </div>
+                            <div class="row pt-2">
+                                <SfMultiSelect TValue="string" TItem="GoodsClass" Placeholder="Select (Goods) Class" DataSource="@goodsinformation" TValueExpression="(Func<GoodsClass, int>)(e => e.GoodsId)"
+                                                        TextExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)" EnableGroupCheckBox="true">
+                                                            <MultiSelectFieldSettings Text="GoodsClassItem" Value="GoodsId"></MultiSelectFieldSettings>
+                                </SfMultiSelect>
+                            </div>
                                 <div class="row pt-2">
-                                <button class="btn add-class-button" @onclick="AddClassEntry">Add Class</button>
                             </div>
                         </div><!--end of Goods and Services-->
                         }
@@ -246,13 +259,15 @@
                                 <div class="form-txt col-2 mt-2">
                                     @foreach (GenderSelect gender in Enum.GetValues(typeof(GenderSelect)))
                                     {
+                                        <div class="row">
                                         <label>
                                             <input type="radio" name="gender" @bind="@AppInfo.ApplicantGender" />
                                             @gender.ToString()
                                         </label>
+                                        </div>
                                     }
                                 </div>
-                                </div>
+                            </div>
                             <div class="row pt-1">
                                 <div class="col-3">
                                     <div class="form-floating form-txt mb-2">
@@ -286,6 +301,7 @@
                                     </div>
                                 </div>
                                 <!--country, city, state-->
+
                                 <div class="col-1 mt-2">
                                     <div class="form-floating form-txt mb-2">
                                         <InputText @bind-Value="@AppInfo.ApplicantZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
@@ -326,11 +342,26 @@
                         <!--RESIDENT AGENT / AUTHORIZED REPRESENTATIVE-->
                         <div class="row d-flex">
                             <div class="tm-info-tle2">RESIDENT AGENT / AUTHORIZED REPRESENTATIVE</div>
-                            <div class="row">
-                                <div class="col">
+                            <div class="row pt-2">
+                                <div class="col-4">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText @bind-Value="@AgentInfo.RAgentNum" placeholder="Resident Agent No." class="form-control" id="raNum" required />
+                                        <label for="raNum">Resident Agent No.</label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText @bind-Value="@AgentInfo.RAgentPosition" placeholder="Position" class="form-control" id="raPosition" required />
+                                        <label for="raPosition">Position</label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-floating form-txt mb-2">
+                                        <InputText @bind-Value="@AgentInfo.FirmLaw" placeholder="Company Name (the Law Firm, if applicable)" class="form-control" id="raCompanyName" required />
+                                        <label for="raCompanyName">Company Name (the Law Firm, if applicable)</label>
+                                    </div>
                                 </div>
                             </div>
-
                             <div class="row pt-1">
                                 <div class="col-3">
                                     <div class="form-floating form-txt mb-2">
@@ -338,7 +369,7 @@
                                         <label for="raFName">Last Name</label>
                                     </div>
                                 </div>
-                                <div class="col-3">
+                                <div class="col-4">
                                     <div class="form-floating form-txt mb-2">
                                         <InputText @bind-Value="@AgentInfo.RAFName" placeholder="First Name" class="form-control" id="raFName" required />
                                         <label for="raFName">First Name</label>
@@ -351,21 +382,29 @@
                                     </div>
                                 </div>
                                 <div class="col-1 mt-2 form-txt">Sex</div>
-                                <div class="form-txt col-2 mt-2">
-                                    <!--for gender radio button-->
+                                <div class="form-txt col-1 mt-2 align-content-start">
+                                    @foreach (GenderSelect gender in Enum.GetValues(typeof(GenderSelect)))
+                                    {
+                                        <div class="row">
+                                        <label>
+                                            <input type="radio" name="gender" @bind="@AppInfo.ApplicantGender" />
+                                            @gender.ToString()
+                                        </label>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                             <div class="row pt-1">
                                 <div class="col">Complete Address</div>
                                 <div class="row">
-                                    <div class="col-5 mt-2">
+                                    <div class="col-4 mt-2">
                                         <div class="form-floating form-txt mb-2 text-wrap">
                                             <InputText @bind-Value="@AgentInfo.RAAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control form-txt" id="applicantAddress" required/>
                                             <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
                                         </div>
                                     </div>
                                     <!--country, city, state-->
-                                    <div class="col mt-2">
+                                    <div class="col-2 mt-2">
                                         <div class="form-floating form-txt mb-2">
                                             <InputText @bind-Value="@AgentInfo.RAZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
                                             <label for="applicantZipCode">Zip Code</label>
@@ -598,6 +637,9 @@
         RetrievedCountries();
         //RetrievedStates();
         //RetrievedCities();
+
+        RetrievedServicesClass();
+        RetrievedGoodsClass();
     }
 
 
@@ -756,8 +798,9 @@
     
 }
 
+<!--for submit preview button with modal-->
 @code{
-    //for submit preview button with modal
+    
     public bool IsOuterDialogVisible { get; set; } = false;
     public bool IsInnerDialogVisible { get; set; } = false;
 
@@ -791,16 +834,6 @@
 <!--for image upload; tm img files-->
 @code {
 
-    private void onFileSelect(SelectedEventArgs args)
-    {
-        args.CurrentRequest = new List<object> { new { Authorization = "test123" } };
-    }
-
-    private void onRemove(BeforeRemoveEventArgs args)
-    {
-        args.CurrentRequest = new List<object> { new { Authorization = "test123" } };
-    }
-
 }
 
 <!--entity modal-->
@@ -815,5 +848,20 @@
         new CompanyEntity(){ ID = "1", EntityName = "Big Entity" },
         new CompanyEntity(){ ID = "2", EntityName = "Small Entity" },
      };
+}
+
+<!--for Goods and Services-->
+@code{
+    private List<GoodsClass> goodsinformation = new List<GoodsClass>();
+    private void RetrievedGoodsClass()
+    {
+        goodsinformation = _goodsclassrepository.GetGoodsClass();
+    }
+
+    private List<ServicesClass> servicesinformation = new List<ServicesClass>();
+    private void RetrievedServicesClass()
+    {
+        servicesinformation = _servicesclassrepository.GetServicesClass();
+    }
 }
 

@@ -6,6 +6,7 @@ namespace Trademark2024.Data
     public class ServicesClass
     {
         public int ServicesId { get; set; }
-        public string? ServicesClassNameItem {  get; set; }
+        public string? ServicesClassItem {  get; set; }
+        public string? ServicesClassDescription { get; set; }
     }
 }

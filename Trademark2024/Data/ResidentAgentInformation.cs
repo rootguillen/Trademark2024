@@ -18,5 +18,9 @@ namespace Trademark2024.Data
         public string? RAMobNum { get; set; }
         public string? RAEmailAdd { get; set; }
         public int? RANationality { get; set; }
+
+        public string? RAgentNum { get; set; }
+        public string? RAgentPosition { get; set; }
+        public string? FirmLaw {  get; set; }
     }
 }

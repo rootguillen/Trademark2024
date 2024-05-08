@@ -7,5 +7,6 @@ namespace Trademark2024.Data
     {
         public int GoodsId { get; set; }
         public string? GoodsClassItem { get; set; }
+        public string ? GoodsClassDescription { get; set; }
     }
 }
