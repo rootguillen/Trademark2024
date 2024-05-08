@@ -21,11 +21,11 @@ namespace Trademark2024.Data
         [Required]
         public string ApplicantAddress { get; set; }
         [Required]
-        public string ApplicantCountry { get; set; }
+        public int? ApplicantCountry { get; set; }
         [Required]
-        public string ApplicantState { get; set; }
+        public int? ApplicantState { get; set; }
         [Required]
-        public string ApplicantCity { get; set; }
+        public int? ApplicantCity { get; set; }
         [Required]
         public string ApplicantZipCode { get; set; }
         [Required]
@@ -33,7 +33,9 @@ namespace Trademark2024.Data
         [Required]
         public string ApplicantEmailAdd { get; set; }
         [Required]
-        public string ApplicantNationality { get; set; }
+        public int? ApplicantNationality { get; set; }
+
+        public string? CompanyEntity { get; set; }
 
     }
 }

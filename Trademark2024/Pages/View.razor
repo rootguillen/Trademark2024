@@ -27,6 +27,7 @@
 @inject AppDbContext _dbContext
 @inject NavigationManager NavigationManager
 @inject ITrademarkInformationRepository _trademarkInformationRepository
+@inject IClaimConventionPropertyRepository _claimconventionpropeprty
 @inject IApplicantInformationRepository _applicantInformationRepository
 @inject IResidentAgentInformationRepository _residentagentinformationRepository
 @inject ICountriesRepository _countriesrepository
@@ -34,17 +35,54 @@
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
 
+
 @foreach (var tm in trademarkinformation)
 {
-    <tr>
-        <td>@tm.TrademarkinformationID</td>
-        <td>@tm.Title</td>
-        <td>@tm.MarkType</td>
-        <td>@tm.ClaimColors</td>
-        <td>@tm.TranslationTransliteration</td>
-        <td>@tm.Disclaimer</td>
-    </tr>
+    <a>Trademark Information</a>
+    <table>
+        <tr>
+            <th>Trademark No.</th>
+            <th>Mark Title</th>
+            <th>Claim of Colors</th>
+            <th>Translation/Transliteration</th>
+            <th>Disclaimer</th>
+        </tr>
+        <tr>
+            <td>@tm.TrademarkinformationID</td>
+            <td>@tm.Title</td>
+            <td>@tm.MarkType</td>
+            <td>@tm.ClaimColors</td>
+            <td>@tm.TranslationTransliteration</td>
+            <td>@tm.Disclaimer</td>
+        </tr>
+    </table>   
 }
+<div class="row pt-2">
+</div>
+@foreach (var app in applicantinformation)
+{
+    <a>Trademark Information</a>
+    <table>
+        <tr>
+            <th>Trademark No.</th>
+            <th>Mark Title</th>
+            <th>Claim of Colors</th>
+            <th>Translation/Transliteration</th>
+            <th>Disclaimer</th>
+        </tr>
+        <tr>
+            <td>@app.ApplicantID</td>
+            <td>@app.ApplicantFName</td>
+            <td>@app.ApplicantMName</td>
+            <td>@app.ApplicantLName</td>
+            <td>@app.ApplicantAddress</td>
+            <td>@app.ApplicantMobNum</td>
+            <td>@app.ApplicantEmailAdd</td>
+            <td>@app.ApplicantGender</td>
+        </tr>
+    </table>
+}
+
 
 @code{
     private List<TrademarkInformation> trademarkinformation;
@@ -52,38 +90,30 @@
     {
         trademarkinformation = _trademarkInformationRepository.GetTrademarkInformation();
     }
+    private List<ClaimConventionProperty> claimconventionproperties;
+    private void RetrievedCCP()
+    {
+        claimconventionproperties = _claimconventionpropeprty.GetClaimConventionProperties();
+    }
+    private List<ApplicantInformation> applicantinformation;
+    private void RetrievedApplicantInformation()
+    {
+        applicantinformation = _applicantInformationRepository.GetApplicantInformation();
+    }
     private List<ResidentAgentInformation> residentAgentInformation;
     private void RetrievedAgentInformation()
     {
         residentAgentInformation = _residentagentinformationRepository.GetAgentInformation();
     }
 
+
+
     protected override void OnInitialized()
     {
         RetrievedTrademarkInformation();
+        RetrievedCCP();
+        RetrievedApplicantInformation();
+        RetrievedAgentInformation();
     }
-
-}
-@code {
-    TrademarkInformation TrademarkInfo { get; set; } = new TrademarkInformation();
-    //ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
-    MarkType SelectedMarkType { get; set; } = MarkType.None;
-
-    private async Task SaveInfo()
-    {
-        TrademarkInfo.MarkType = SelectedMarkType.ToString();
-
-        // Add the objects to the DbContext
-        _dbContext.TrademarkInformation.Add(TrademarkInfo);
-        //_dbContext.ResidentAgentInformation.Add(AgentInfo);
-
-        // Save changes to the database
-        await _dbContext.SaveChangesAsync();
-
-        // Optionally, you can reset the objects for a new entry
-        TrademarkInfo = new TrademarkInformation();
-        //AgentInfo = new ResidentAgentInformation();
-    }
-
 
 }

@@ -1,4 +1,4 @@
-﻿namespace IPOPHLTrademark.Client.Shared.Enum
+﻿namespace Trademark2024.Shared.Enum
 {
     public enum GenderSelect
     {

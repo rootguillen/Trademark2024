@@ -23,6 +23,9 @@ builder.Services.AddScoped<IStatesRepository, StatesRepository>();
 builder.Services.AddScoped<ICitiesRepository, CitiesRepository>();
 builder.Services.AddScoped<INationalitiesRepository, NationalitiesRepository>();
 
+builder.Services.AddScoped<IGoodsClassRepository, GoodsClassRepository>();
+builder.Services.AddScoped<IServicesClassRepository, ServicesClassRepository>();
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnectionString")));
 
 var app = builder.Build();

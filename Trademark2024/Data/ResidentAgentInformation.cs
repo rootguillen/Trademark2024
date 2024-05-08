@@ -11,8 +11,12 @@ namespace Trademark2024.Data
         public string? RAMName { get; set; }
         public string? RAGender {  get; set; }
         public string? RAAddress { get; set; }
+        public int? RACountry { get; set; }
+        public int? RAState { get; set; }
+        public int? RACity { get; set; }
         public string? RAZipCode { get; set; }
         public string? RAMobNum { get; set; }
         public string? RAEmailAdd { get; set; }
+        public int? RANationality { get; set; }
     }
 }

@@ -15,5 +15,15 @@ namespace Trademark2024.Data
         {
             return _dbContext.ClaimConventionProperty.ToList();
         }
+
+        public void UpdateSelectedCountry(int claimConventionPropertyId, int selectedCCPCountryId)
+        {
+            var claimConventionProperty = _dbContext.ClaimConventionProperty.FirstOrDefault(c => c.ClaimConventionPropertyID == claimConventionPropertyId);
+            if (claimConventionProperty != null)
+            {
+                claimConventionProperty.CCPCountry = selectedCCPCountryId;
+                _dbContext.SaveChanges();
+            }
+        }
     }
 }
