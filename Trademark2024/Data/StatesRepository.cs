@@ -16,5 +16,10 @@ namespace Trademark2024.Data
             return _dbContext.States.ToList();
         }
 
+        public List<States> GetStatesByCountryId(int countryId)
+        {
+            return _dbContext.States.Where(s => s.CountryId == countryId).ToList();
+        }
+
     }
 }

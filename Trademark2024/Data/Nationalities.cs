@@ -11,6 +11,5 @@ namespace Trademark2024.Data
         public string alpha_3_code { get; set;}
         public string en_short_name { get; set; }
 
-        public ICollection<States> States { get; set; }
     }
 }

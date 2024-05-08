@@ -16,11 +16,9 @@ namespace Trademark2024.Data
             return _dbContext.Cities.ToList();
         }
 
-        public async Task<List<Cities>> GetCitiesByStateId(int stateId)
+        public List<Cities> GetCitiesByStateId(int stateId)
         {
-            return await _dbContext.Cities
-                                  .Where(c => c.StateId == stateId)
-                                  .ToListAsync();
+            return _dbContext.Cities.Where(c => c.StateId == stateId).ToList();
         }
     }
 }

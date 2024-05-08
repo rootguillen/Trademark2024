@@ -140,7 +140,7 @@
 
                                     </div>
                                 </div>
-                                <div class="row ps-2 pe-2">
+                                <div class="row ps-3 pe-3">
                                     <div class="card">
                                         @if (isChecked)
                                         {
@@ -216,6 +216,7 @@
                                                             <MultiSelectFieldSettings Text="GoodsClassItem" Value="GoodsId"></MultiSelectFieldSettings>
                                 </SfMultiSelect>
                             </div>
+                            <!--show description-->
                                 <div class="row pt-2">
                             </div>
                         </div><!--end of Goods and Services-->
@@ -292,23 +293,23 @@
                                 </div>
                             </div>
                             <div class="row pt-1">
-                            <div class="col">Complete Address</div>
-                            <div class="row">
-                                <div class="col-5 mt-2">
-                                    <div class="form-floating form-txt mb-2">
-                                        <InputText @bind-Value="@AppInfo.ApplicantAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control" id="applicantAddress" required />
-                                        <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
+                                <div class="col">Complete Address</div>
+                                <div class="row">
+                                    <div class="col-5 mt-2">
+                                        <div class="form-floating form-txt mb-2">
+                                            <InputText @bind-Value="@AppInfo.ApplicantAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control" id="applicantAddress" required />
+                                            <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
+                                        </div>
                                     </div>
-                                </div>
-                                <!--country, city, state-->
+                                    <!--country, city, state-->
 
-                                <div class="col-1 mt-2">
-                                    <div class="form-floating form-txt mb-2">
-                                        <InputText @bind-Value="@AppInfo.ApplicantZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
-                                        <label for="applicantZipCode">Zip Code</label>
+                                    <div class="col-1 mt-2">
+                                        <div class="form-floating form-txt mb-2">
+                                            <InputText @bind-Value="@AppInfo.ApplicantZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
+                                            <label for="applicantZipCode">Zip Code</label>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             </div>
                             <div class="row">
                                 <div class="col">
@@ -397,13 +398,41 @@
                             <div class="row pt-1">
                                 <div class="col">Complete Address</div>
                                 <div class="row">
-                                    <div class="col-4 mt-2">
+                                    <div class="col-5 mt-2">
                                         <div class="form-floating form-txt mb-2 text-wrap">
                                             <InputText @bind-Value="@AgentInfo.RAAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control form-txt" id="applicantAddress" required/>
                                             <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
                                         </div>
                                     </div>
                                     <!--country, city, state-->
+                                    <div class="col form-txt mb-2 mt-2">
+                                        <select @onchange="UpdateFilteredStates" class="form-control" style="height: 58px;">
+                                            <option value="" disabled selected>Country</option>
+                                            @foreach (var country in countries)
+                                            {
+                                                <option value="@country.Id">@country.CountryName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col form-txt mb-2 mt-2">
+                                        <select @onchange="UpdateFilteredCities" class="form-control" style="height: 58px;">
+                                            <option value="" disabled selected>State</option>
+                                            @foreach (var state in filteredStates)
+                                                {
+                                                    <option value="@state.Id">@state.StateName</option>
+                                                }
+                                        </select>
+                                    </div>
+                                    <div class="col form-txt mb-2 mt-2">
+                                        <select class="form-control" style="height: 58px;">
+                                            <option value="" disabled selected>City</option>
+                                            @foreach (var city in filteredCities)
+                                            {
+                                                <option>@city.CityName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                        
                                     <div class="col-2 mt-2">
                                         <div class="form-floating form-txt mb-2">
                                             <InputText @bind-Value="@AgentInfo.RAZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
@@ -823,7 +852,7 @@
 
 <!--for type of applicant; able/disable-->
 @code{
-    private string stringChecked = "Individual";
+    private string? stringChecked = null;
     bool isIndividualSelected = false;
     void ToggleApplicantType(bool isIndividual)
     {
@@ -831,10 +860,6 @@
     }
 }
 
-<!--for image upload; tm img files-->
-@code {
-
-}
 
 <!--entity modal-->
 @code{
@@ -862,6 +887,39 @@
     private void RetrievedServicesClass()
     {
         servicesinformation = _servicesclassrepository.GetServicesClass();
+    }
+}
+
+<!--country, state, city dropdown cascading-->
+@code {
+    private List<Countries> countries;
+    private List<States> filteredStates;
+    private List<Cities> filteredCities;
+    private int selectedCountryId; //selected country id
+    private int selectedStateId; //Selected state id
+
+    protected override void OnInitialized()
+    {
+        countries = _countriesrepository.GetCountries();
+        UpdateFilteredStates(null); // Fetch states initially
+    }
+
+    private void UpdateFilteredStates(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            selectedCountryId = Convert.ToInt32(e.Value);
+        }
+        filteredStates = _statesrepository.GetStatesByCountryId(selectedCountryId);
+        // Reset selected state and cities when country changes
+        selectedStateId = 0;
+        filteredCities = new List<Cities>();
+    }
+
+    private void UpdateFilteredCities(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        selectedStateId = Convert.ToInt32(e.Value);
+        filteredCities = _citiesrepository.GetCitiesByStateId(selectedStateId);
     }
 }
 

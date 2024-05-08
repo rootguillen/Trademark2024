@@ -1,0 +1,67 @@
+﻿@page "/test"
+@using Trademark2024.Data
+@inject ICountriesRepository CountriesRepository
+@inject IStatesRepository StatesRepository
+@inject ICitiesRepository CitiesRepository
+
+<div class="col form-txt">
+    <label>Country of Residence</label>
+    <select @onchange="UpdateFilteredStates" class="form-control" Placeholder="Select Country Residence">
+        @foreach (var country in countries)
+        {
+            <option value="@country.Id">@country.CountryName</option>
+        }
+    </select>
+</div>
+
+<div class="col form-txt">
+    <label>State/Province</label>
+    <select @onchange="UpdateFilteredCities" class="form-control">
+        @foreach (var state in filteredStates)
+        {
+            <option value="@state.Id">@state.StateName</option>
+        }
+    </select>
+</div>
+
+<div class="col form-txt">
+    <label>City</label>
+    <select class="form-control">
+        @foreach (var city in filteredCities)
+        {
+            <option>@city.CityName</option>
+        }
+    </select>
+</div>
+
+@code {
+    private List<Countries> countries;
+    private List<States> filteredStates;
+    private List<Cities> filteredCities;
+    private int selectedCountryId; //selected country id
+    private int selectedStateId; //Selected state id
+
+    protected override void OnInitialized()
+    {
+        countries = CountriesRepository.GetCountries();
+        UpdateFilteredStates(null); // Fetch states initially
+    }
+
+    private void UpdateFilteredStates(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            selectedCountryId = Convert.ToInt32(e.Value);
+        }
+        filteredStates = StatesRepository.GetStatesByCountryId(selectedCountryId);
+        // Reset selected state and cities when country changes
+        selectedStateId = 0;
+        filteredCities = new List<Cities>();
+    }
+
+    private void UpdateFilteredCities(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        selectedStateId = Convert.ToInt32(e.Value);
+        filteredCities = CitiesRepository.GetCitiesByStateId(selectedStateId);
+    }
+}
