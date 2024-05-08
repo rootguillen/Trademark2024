@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Blazor;
 using Trademark2024.Data;
+using Trademark2024.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IStatesRepository, StatesRepository>();
 builder.Services.AddScoped<ICitiesRepository, CitiesRepository>();
 builder.Services.AddScoped<INationalitiesRepository, NationalitiesRepository>();
 
+builder.Services.AddScoped<IGoodsServicesInformationRepository, GoodsServicesInformationRepository>();
 builder.Services.AddScoped<IGoodsClassRepository, GoodsClassRepository>();
 builder.Services.AddScoped<IServicesClassRepository, ServicesClassRepository>();
 

@@ -1,6 +1,13 @@
 ﻿@page "/tm"
 @using Trademark2024.Data
-@using Microsoft.EntityFrameworkCore;
+@using Trademark2024.Services
+@using Trademark2024.Shared.Enum
+@using Trademark2024.Interface
+
+@inject AppDbContext dbContext
+@inject HttpClient Http
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Collections.Generic
 @using Syncfusion.Blazor
@@ -22,6 +29,12 @@
 @inject IStatesRepository _statesrepository
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
+
+@inject IGoodsClassRepository _goodsclassrepository
+@inject IServicesClassRepository _servicesclassrepository
+
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle>TM List DB Conn</PageTitle>
 <div class="row">

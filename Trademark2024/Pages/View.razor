@@ -1,12 +1,8 @@
 ﻿@page "/view"
 @using Trademark2024.Data
-@using Microsoft.EntityFrameworkCore;
-@using Microsoft.AspNetCore.Components.Forms
-@using System.Collections.Generic
-
-@using Trademark2024.Data
 @using Trademark2024.Services
 @using Trademark2024.Shared.Enum
+@using Trademark2024.Interface
 
 @inject AppDbContext dbContext
 @inject HttpClient Http
@@ -27,13 +23,20 @@
 @inject AppDbContext _dbContext
 @inject NavigationManager NavigationManager
 @inject ITrademarkInformationRepository _trademarkInformationRepository
-@inject IClaimConventionPropertyRepository _claimconventionpropeprty
 @inject IApplicantInformationRepository _applicantInformationRepository
-@inject IResidentAgentInformationRepository _residentagentinformationRepository
+@inject IClaimConventionPropertyRepository _claimconventionproperty
+@inject IResidentAgentInformationRepository _residentagentinformation
+
 @inject ICountriesRepository _countriesrepository
 @inject IStatesRepository _statesrepository
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
+
+@inject IGoodsClassRepository _goodsclassrepository
+@inject IServicesClassRepository _servicesclassrepository
+
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
 
 
 @foreach (var tm in trademarkinformation)
@@ -93,7 +96,7 @@
     private List<ClaimConventionProperty> claimconventionproperties;
     private void RetrievedCCP()
     {
-        claimconventionproperties = _claimconventionpropeprty.GetClaimConventionProperties();
+        claimconventionproperties = _claimconventionproperty.GetClaimConventionProperties();
     }
     private List<ApplicantInformation> applicantinformation;
     private void RetrievedApplicantInformation()
@@ -103,7 +106,7 @@
     private List<ResidentAgentInformation> residentAgentInformation;
     private void RetrievedAgentInformation()
     {
-        residentAgentInformation = _residentagentinformationRepository.GetAgentInformation();
+        residentAgentInformation = _residentagentinformation.GetAgentInformation();
     }
 
 

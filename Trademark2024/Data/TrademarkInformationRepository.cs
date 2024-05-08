@@ -1,4 +1,6 @@
-﻿namespace Trademark2024.Data
+﻿using Trademark2024.Interface;
+
+namespace Trademark2024.Data
 {
     public class TrademarkInformationRepository : ITrademarkInformationRepository
     {

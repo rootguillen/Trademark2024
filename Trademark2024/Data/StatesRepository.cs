@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Trademark2024.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Trademark2024.Data
 {

@@ -13,6 +13,7 @@ namespace Trademark2024.Data
         public DbSet<Cities> Cities { get; set; }
         public DbSet<Nationalities> Nationalities { get; set; }
 
+        public DbSet<GoodsServicesInformation> GoodsServicesInformation { get; set; }
         public DbSet<GoodsClass> GoodsClass { get; set; }
         public DbSet<ServicesClass> ServicesClass { get; set; }
 

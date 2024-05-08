@@ -1,9 +1,11 @@
 ﻿@page "/"
+@using Trademark2024
 @using Trademark2024.Data
 @using Trademark2024.Services
 @using Trademark2024.Shared.Enum
+@using Trademark2024.Interface
 
-@inject AppDbContext dbContext
+@inject AppDbContext _dbContext
 @inject HttpClient Http
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components
@@ -21,8 +23,10 @@
 
 @inject AppDbContext _dbContext
 @inject NavigationManager NavigationManager
-@inject ITrademarkInformationRepository _trademarkInformationRepository
-@inject IApplicantInformationRepository _applicantInformationRepository
+@inject ITrademarkInformationRepository _trademarkInformationrepository
+@inject IApplicantInformationRepository _applicantInformationrepository
+@inject IClaimConventionPropertyRepository _claimconventionpropertyrepository
+@inject IResidentAgentInformationRepository _residentagentinformationrepositroy
 
 @inject ICountriesRepository _countriesrepository
 @inject IStatesRepository _statesrepository
@@ -204,20 +208,54 @@
                             <div class="row d-flex">
                                 <div class="tm-info-tle2">GOODS AND SERVICES</div>
                             </div>
+
                             <div class="row pt-2">
-                                <SfMultiSelect TValue="string" TItem="ServicesClass" Placeholder="Select (Services) Class" DataSource="@servicesinformation" TValueExpression="(Func<ServicesClass, int>)(e => e.ServicesId)"
-                                                        TextExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)" EnableGroupCheckBox="true">
-                                                            <MultiSelectFieldSettings Text="ServicesClassItem" Value="ServicesId"></MultiSelectFieldSettings>
-                                </SfMultiSelect>
+                                <div class="col-6">
+                                    <label class="form-txt fst-italic">Select (Goods) Class</label>
+                                    <SfMultiSelect Placeholder="Select (Goods) Class" DataSource="@goodsinformation" TValueExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)"
+                                        TextExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)" EnableGroupCheckBox="true" @bind-Value="@GoodsServicesInfo.GoodsClassId">
+                                        <MultiSelectFieldSettings Text="GoodsClassItem" Value="GoodsClassItem"></MultiSelectFieldSettings>
+                                    </SfMultiSelect>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-txt fst-italic">Select (Services) Class</label>
+                                    <SfMultiSelect Placeholder="Select (Services) Class" DataSource="@servicesinformation" TValueExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)"
+                                        TextExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)" EnableGroupCheckBox="true" @bind-Value="@GoodsServicesInfo.ServiceClassId">
+                                        <MultiSelectFieldSettings Text="ServicesClassItem" Value="ServicesClassItem"></MultiSelectFieldSettings>
+                                    </SfMultiSelect>
+                                </div>
                             </div>
                             <div class="row pt-2">
-                                <SfMultiSelect TValue="string" TItem="GoodsClass" Placeholder="Select (Goods) Class" DataSource="@goodsinformation" TValueExpression="(Func<GoodsClass, int>)(e => e.GoodsId)"
-                                                        TextExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)" EnableGroupCheckBox="true">
-                                                            <MultiSelectFieldSettings Text="GoodsClassItem" Value="GoodsId"></MultiSelectFieldSettings>
-                                </SfMultiSelect>
+                                <div class="col-6 form-txt pt-3 ps-3 pe-3">
+                                
+                                    @foreach (var goodsClass in goodsinformation)
+                                    {   
+                                        foreach(var goodsClassItem in GoodsServicesInfo.GoodsClassId)
+                                        {
+                                            if (goodsClassItem == goodsClass.GoodsClassItem)
+                                            {   
+                                                <div class="form-txt fw-bold">Goods Class Classification</div>
+                                                <div class="mt-1">@goodsClass.GoodsClassDescription</div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                                <div class="col-6 form-txt pt-1 ps-3 pe-3">
+                                    @foreach (var servicesClass in servicesinformation)
+                                    {
+                                        foreach(var servicesClassItem in GoodsServicesInfo.ServiceClassId)
+                                        {
+                                            if (servicesClassItem == servicesClass.ServicesClassItem)
+                                            {
+                                                <div class="form-txt fw-bold">Services Class Classification</div>
+                                                <div class="mt-1">@servicesClass.ServicesClassDescription</div>
+                                            }
+                                        }
+                                    }
+                                </div>
                             </div>
                             <!--show description-->
-                                <div class="row pt-2">
+                            <div class="row pt-2">
                             </div>
                         </div><!--end of Goods and Services-->
                         }
@@ -404,13 +442,12 @@
                                             <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
                                         </div>
                                     </div>
-                                    <!--country, city, state-->
                                     <div class="col form-txt mb-2 mt-2">
                                         <select @onchange="UpdateFilteredStates" class="form-control" style="height: 58px;">
                                             <option value="" disabled selected>Country</option>
                                             @foreach (var country in countries)
                                             {
-                                                <option value="@country.Id">@country.CountryName</option>
+                                                <option value="@country.Id" class="form-txt">@country.CountryName</option>
                                             }
                                         </select>
                                     </div>
@@ -419,7 +456,7 @@
                                             <option value="" disabled selected>State</option>
                                             @foreach (var state in filteredStates)
                                                 {
-                                                    <option value="@state.Id">@state.StateName</option>
+                                                    <option value="@state.Id" class="form-txt">@state.StateName</option>
                                                 }
                                         </select>
                                     </div>
@@ -428,7 +465,7 @@
                                             <option value="" disabled selected>City</option>
                                             @foreach (var city in filteredCities)
                                             {
-                                                <option>@city.CityName</option>
+                                                <option class="form-txt">@city.CityName</option>
                                             }
                                         </select>
                                     </div>
@@ -460,12 +497,10 @@
                                 </div>
                                 <div class="col mt-2">
                                     <div class="form-floating form-txt mb-2">
-                                    <div class="row">
                                         <SfDropDownList TValue="int?" TItem="Nationalities" Placeholder="Select Nationality" DataSource="@nationalitiesinformation" TValueExpression="(Func<Nationality, int>)(e => e.num_code)"
-                                                        TextExpression="(Func<Nationality, string>)(e => e.nationality)" @bind-Value="@AgentInfo.RANationality">
+                                                        TextExpression="(Func<Nationality, string>)(e => e.nationality)" @bind-Value="@AgentInfo.RANationality" style="height: 36px;">
                                             <DropDownListFieldSettings Text="nationality" Value="num_code"></DropDownListFieldSettings>
                                         </SfDropDownList>
-                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -612,6 +647,7 @@
     TrademarkInformation TrademarkInfo { get; set; } = new TrademarkInformation();
     ClaimConventionProperty CCPInfo { get; set; } = new ClaimConventionProperty();
     ApplicantInformation AppInfo { get; set; } = new ApplicantInformation();
+    GoodsServicesInformation GoodsServicesInfo { get; set; } = new GoodsServicesInformation();
 
     ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
 
@@ -622,8 +658,10 @@
         IsInnerDialogVisible = false;
         IsOuterDialogVisible = false;
 
-        //convert mark type to string
+        //convert to string
         TrademarkInfo.MarkType = selectedMarkType.ToString();
+
+
 
         // Add the objects to the DbContext
         _dbContext.TrademarkInformation.Add(TrademarkInfo);
@@ -635,7 +673,7 @@
         }
         _dbContext.ResidentAgentInformation.Add(AgentInfo);
         _dbContext.ApplicantInformation.Add(AppInfo);
-
+        _dbContext.GoodsServicesInformation.Add(GoodsServicesInfo);
 
         //save changes to the database
         await _dbContext.SaveChangesAsync();
@@ -644,6 +682,7 @@
         TrademarkInfo = new TrademarkInformation();
         AppInfo = new ApplicantInformation();
         AgentInfo = new ResidentAgentInformation();
+        GoodsServicesInfo = new GoodsServicesInformation();
     }
 
 
@@ -666,7 +705,7 @@
         RetrievedCountries();
         //RetrievedStates();
         //RetrievedCities();
-
+        //await FetchGoodsIds();
         RetrievedServicesClass();
         RetrievedGoodsClass();
     }
@@ -888,6 +927,11 @@
     {
         servicesinformation = _servicesclassrepository.GetServicesClass();
     }
+
+    
+
+    
+    
 }
 
 <!--country, state, city dropdown cascading-->
@@ -923,3 +967,5 @@
     }
 }
 
+
+<!--for handling goodsservices-->
