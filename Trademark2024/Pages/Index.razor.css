@@ -159,3 +159,15 @@
 .submit-preview-modal {
     text-align: justify;
 }
+
+.with-icon {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('dropdown-icon.png'); /* Replace 'dropdown-icon.png' with the path to your icon */
+    background-repeat: no-repeat;
+    background-position: right center;
+    padding-right: 30px; /* Adjust as needed to accommodate the icon */
+    height: 20px;
+    width: 100%;
+}

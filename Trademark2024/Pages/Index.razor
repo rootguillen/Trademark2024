@@ -212,14 +212,14 @@
                             <div class="row pt-2">
                                 <div class="col-6">
                                     <label class="form-txt fst-italic">Select (Goods) Class</label>
-                                    <SfMultiSelect Placeholder="Select (Goods) Class" DataSource="@goodsinformation" TValueExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)"
+                                    <SfMultiSelect Placeholder="(Goods) Class" DataSource="@goodsinformation" TValueExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)"
                                         TextExpression="(Func<GoodsClass, string>)(e => e.GoodsClassItem)" EnableGroupCheckBox="true" @bind-Value="@GoodsServicesInfo.GoodsClassId">
                                         <MultiSelectFieldSettings Text="GoodsClassItem" Value="GoodsClassItem"></MultiSelectFieldSettings>
                                     </SfMultiSelect>
                                 </div>
                                 <div class="col-6">
                                     <label class="form-txt fst-italic">Select (Services) Class</label>
-                                    <SfMultiSelect Placeholder="Select (Services) Class" DataSource="@servicesinformation" TValueExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)"
+                                    <SfMultiSelect Placeholder="(Services) Class" DataSource="@servicesinformation" TValueExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)"
                                         TextExpression="(Func<ServicesClass, string>)(e => e.ServicesClassItem)" EnableGroupCheckBox="true" @bind-Value="@GoodsServicesInfo.ServiceClassId">
                                         <MultiSelectFieldSettings Text="ServicesClassItem" Value="ServicesClassItem"></MultiSelectFieldSettings>
                                     </SfMultiSelect>
@@ -253,9 +253,6 @@
                                         }
                                     }
                                 </div>
-                            </div>
-                            <!--show description-->
-                            <div class="row pt-2">
                             </div>
                         </div><!--end of Goods and Services-->
                         }
@@ -312,7 +309,7 @@
                                     <div class="form-floating form-txt mb-2">
                                         <InputText @bind-Value="@AppInfo.ApplicantPosition" placeholder="Applicant Position" class="form-control" id="applicantPosition"
                                         disabled="@isIndividualSelected" />
-                                        <label for="applicantPosition">Applicant Position</label
+                                        <label for="applicantPosition">Applicant Position</label>
                                     </div>
                                 </div>
                                 <div class="col-7">
@@ -322,9 +319,8 @@
                                         <label for="nameCompanyCorpGovASch">Name of Company / Corporation / Government Agency / School</label>
                                     </div>
                                 </div>
-                                <div class="col-2 mt-2 form-txt">
-                                    <label class="example-label">Company Entity</label>
-                                    <SfDropDownList TItem="CompanyEntity" TValue="string" Placeholder="Select Company Entity" @bind-Value="@AppInfo.CompanyEntity" DataSource="@companyEntity" disabled="@isIndividualSelected">
+                                <div class="col-2 mt-2 form-txt/ux wit
+                                    <SfDropDownList TItem="CompanyEntity" TValue="string" Placeholder="Select Company Entity" @bind-Value="@AppInfo.CompanyEntity" DataSource="@companyEntity" style="heigth: 58px;" disabled="@isIndividualSelected">
                                         <DropDownListEvents TItem="CompanyEntity" TValue="string"/>
                                         <DropDownListFieldSettings Text="EntityName" Value="ID"/>
                                     </SfDropDownList>
@@ -333,15 +329,40 @@
                             <div class="row pt-1">
                                 <div class="col">Complete Address</div>
                                 <div class="row">
-                                    <div class="col-5 mt-2">
+                                    <div class="col-2 form-txt mb-2 mt-2">
+                                        <select @onchange="UpdateFilteredStates" class="form-control" style="height: 58px;">
+                                            <option value="" disabled selected>Country</option>
+                                            @foreach (var country in countries)
+                                            {
+                                                <option value="@country.Id" class="form-txt">@country.CountryName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-2 form-txt mb-2 mt-2">
+                                        <select @onchange="UpdateFilteredCities" class="form-control" style="height: 58px;">
+                                            <option value="" disabled selected>State</option>
+                                            @foreach (var state in filteredStates)
+                                                {
+                                                    <option value="@state.Id" class="form-txt">@state.StateName</option>
+                                                }
+                                        </select>
+                                    </div>
+                                    <div class="col-2 form-txt mb-2 mt-2">
+                                        <select class="form-control" style="height: 58px;">
+                                            <option value="" disabled selected>City</option>
+                                            @foreach (var city in filteredCities)
+                                            {
+                                                <option class="form-txt">@city.CityName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-4 mt-2">
                                         <div class="form-floating form-txt mb-2">
                                             <InputText @bind-Value="@AppInfo.ApplicantAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control" id="applicantAddress" required />
                                             <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
                                         </div>
                                     </div>
-                                    <!--country, city, state-->
-
-                                    <div class="col-1 mt-2">
+                                    <div class="col-2 mt-2">
                                         <div class="form-floating form-txt mb-2">
                                             <InputText @bind-Value="@AppInfo.ApplicantZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
                                             <label for="applicantZipCode">Zip Code</label>
@@ -436,13 +457,7 @@
                             <div class="row pt-1">
                                 <div class="col">Complete Address</div>
                                 <div class="row">
-                                    <div class="col-5 mt-2">
-                                        <div class="form-floating form-txt mb-2 text-wrap">
-                                            <InputText @bind-Value="@AgentInfo.RAAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control form-txt" id="applicantAddress" required/>
-                                            <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
-                                        </div>
-                                    </div>
-                                    <div class="col form-txt mb-2 mt-2">
+                                    <div class="col-2 form-txt mb-2 mt-2">
                                         <select @onchange="UpdateFilteredStates" class="form-control" style="height: 58px;">
                                             <option value="" disabled selected>Country</option>
                                             @foreach (var country in countries)
@@ -451,7 +466,7 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="col form-txt mb-2 mt-2">
+                                    <div class="col-2 form-txt mb-2 mt-2">
                                         <select @onchange="UpdateFilteredCities" class="form-control" style="height: 58px;">
                                             <option value="" disabled selected>State</option>
                                             @foreach (var state in filteredStates)
@@ -460,7 +475,7 @@
                                                 }
                                         </select>
                                     </div>
-                                    <div class="col form-txt mb-2 mt-2">
+                                    <div class="col-2 form-txt mb-2 mt-2">
                                         <select class="form-control" style="height: 58px;">
                                             <option value="" disabled selected>City</option>
                                             @foreach (var city in filteredCities)
@@ -469,7 +484,12 @@
                                             }
                                         </select>
                                     </div>
-                                        
+                                    <div class="col-4 mt-2">
+                                        <div class="form-floating form-txt mb-2 text-wrap">
+                                            <InputText @bind-Value="@AgentInfo.RAAddress" placeholder="House No., Street Info, Village/Subdivision, Barangay" class="form-control form-txt" id="applicantAddress" required/>
+                                            <label for="applicantAddress">House No., Street Info, Village/Subdivision, Barangay</label>
+                                        </div>
+                                    </div>
                                     <div class="col-2 mt-2">
                                         <div class="form-floating form-txt mb-2">
                                             <InputText @bind-Value="@AgentInfo.RAZipCode" placeholder="Zip Code" class="form-control" id="applicantZipCode" required />
@@ -507,7 +527,7 @@
                         </div><!--end of resident agent-->
                         
                         <div class="card-footer footer-tm">
-                            <SfButton CssClass = "e-outline" @onclick="@OpenOuterDialog">Submit for preview</SfButton>
+                            <SfButton CssClass = "e-outline" @onclick="@OpenOuterDialog">Submit and preview</SfButton>
                         </div>
                     }
                     
@@ -646,9 +666,8 @@
 @code {
     TrademarkInformation TrademarkInfo { get; set; } = new TrademarkInformation();
     ClaimConventionProperty CCPInfo { get; set; } = new ClaimConventionProperty();
-    ApplicantInformation AppInfo { get; set; } = new ApplicantInformation();
     GoodsServicesInformation GoodsServicesInfo { get; set; } = new GoodsServicesInformation();
-
+    ApplicantInformation AppInfo { get; set; } = new ApplicantInformation();
     ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
 
 
@@ -680,9 +699,9 @@
 
         //reset the objects for a new entry
         TrademarkInfo = new TrademarkInformation();
+        GoodsServicesInfo = new GoodsServicesInformation();
         AppInfo = new ApplicantInformation();
         AgentInfo = new ResidentAgentInformation();
-        GoodsServicesInfo = new GoodsServicesInformation();
     }
 
 
@@ -952,7 +971,7 @@
     {
         if (e != null)
         {
-            selectedCountryId = Convert.ToInt32(e.Value);
+            AppInfo.ApplicantCountry = selectedCountryId = Convert.ToInt32(e.Value);
         }
         filteredStates = _statesrepository.GetStatesByCountryId(selectedCountryId);
         // Reset selected state and cities when country changes
