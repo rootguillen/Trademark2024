@@ -19,6 +19,8 @@
 @using Syncfusion.Blazor.SplitButtons
 @using Syncfusion.Blazor.Cards
 @using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Grids
+
 
 @inject AppDbContext _dbContext
 @inject NavigationManager NavigationManager
@@ -32,60 +34,33 @@
 @inject ICitiesRepository _citiesrepository
 @inject INationalitiesRepository _nationalityrepository
 
+@inject IGoodsServicesInformationRepository _goodsservicesrepository
 @inject IGoodsClassRepository _goodsclassrepository
 @inject IServicesClassRepository _servicesclassrepository
 
 @inject IJSRuntime jsRuntime
 @inject NavigationManager NavigationManager
 
-
-@foreach (var tm in trademarkinformation)
-{
-    <a>Trademark Information</a>
-    <table>
-        <tr>
-            <th>Trademark No.</th>
-            <th>Mark Title</th>
-            <th>Claim of Colors</th>
-            <th>Translation/Transliteration</th>
-            <th>Disclaimer</th>
-        </tr>
-        <tr>
-            <td>@tm.TrademarkinformationID</td>
-            <td>@tm.Title</td>
-            <td>@tm.MarkType</td>
-            <td>@tm.ClaimColors</td>
-            <td>@tm.TranslationTransliteration</td>
-            <td>@tm.Disclaimer</td>
-        </tr>
-    </table>   
-}
 <div class="row pt-2">
 </div>
-@foreach (var app in applicantinformation)
-{
-    <a>Trademark Information</a>
-    <table>
-        <tr>
-            <th>Trademark No.</th>
-            <th>Mark Title</th>
-            <th>Claim of Colors</th>
-            <th>Translation/Transliteration</th>
-            <th>Disclaimer</th>
-        </tr>
-        <tr>
-            <td>@app.ApplicantID</td>
-            <td>@app.ApplicantFName</td>
-            <td>@app.ApplicantMName</td>
-            <td>@app.ApplicantLName</td>
-            <td>@app.ApplicantAddress</td>
-            <td>@app.ApplicantMobNum</td>
-            <td>@app.ApplicantEmailAdd</td>
-            <td>@app.ApplicantGender</td>
-        </tr>
-    </table>
-}
 
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            <SfGrid DataSource="@trademarkinformation" AllowPaging="true" >
+                <GridColumns>
+                    <Syncfusion.Blazor.Grids.GridColumn Field=@nameof(TrademarkInformation.TrademarkinformationID) HeaderText="Trademark No." TextAlign="TextAlign.Left"  Width="120"></Syncfusion.Blazor.Grids.GridColumn>
+                    <Syncfusion.Blazor.Grids.GridColumn Field=@nameof(TrademarkInformation.Title) HeaderText="Mark Title" Width="150"></Syncfusion.Blazor.Grids.GridColumn>
+                    <Syncfusion.Blazor.Grids.GridColumn Field=@nameof(TrademarkInformation.MarkType) HeaderText="Mark Type" Format="d" TextAlign="TextAlign.Left" Width="130"></Syncfusion.Blazor.Grids.GridColumn>
+                    <Syncfusion.Blazor.Grids.GridColumn Field=@nameof(TrademarkInformation.ClaimColors) Format="Claims of Colors" TextAlign="TextAlign.Left" Width="120"></Syncfusion.Blazor.Grids.GridColumn>
+                    <Syncfusion.Blazor.Grids.GridColumn Field=@nameof(TrademarkInformation.Disclaimer) HeaderText="Disclaimer" Width="150"></Syncfusion.Blazor.Grids.GridColumn>
+                    <Syncfusion.Blazor.Grids.GridColumn Field=@nameof(TrademarkInformation.TranslationTransliteration) HeaderText="Translation/Transliteration" Width="150"></Syncfusion.Blazor.Grids.GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+        
+    </div>
+</div>
 
 @code{
     private List<TrademarkInformation> trademarkinformation;
@@ -108,15 +83,19 @@
     {
         residentAgentInformation = _residentagentinformation.GetAgentInformation();
     }
-
+    private List<GoodsServicesInformation> goodsServicesInformation;
+    private void RetrievedGoodsServicesInformation()
+    {
+        goodsServicesInformation = _goodsservicesrepository.GetGoodsServicesInformation();
+    }
 
 
     protected override void OnInitialized()
     {
         RetrievedTrademarkInformation();
-        RetrievedCCP();
-        RetrievedApplicantInformation();
-        RetrievedAgentInformation();
+        //RetrievedCCP();
+        //RetrievedGoodsServicesInformation();
+        //RetrievedApplicantInformation();
+        //RetrievedAgentInformation();
     }
-
 }

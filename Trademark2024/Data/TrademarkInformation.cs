@@ -12,6 +12,6 @@ namespace Trademark2024.Data
         public string ClaimColors { get; set; }
         public string TranslationTransliteration { get; set; }
         public string Disclaimer { get; set; }
-        //public string TrademarkIMG { get; set; }
+        //public byte[] TrademarkIMG { get; set; }
     }
 }

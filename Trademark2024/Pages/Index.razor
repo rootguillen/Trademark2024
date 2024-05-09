@@ -10,6 +10,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Http
 @using System.Collections.Generic
 @using Syncfusion.Blazor
 @using Syncfusion.Blazor.Data
@@ -20,6 +21,7 @@
 @using Syncfusion.Blazor.SplitButtons
 @using Syncfusion.Blazor.Cards
 @using Syncfusion.Blazor.Popups
+@using System.IO;
 
 @inject AppDbContext _dbContext
 @inject NavigationManager NavigationManager
@@ -62,7 +64,6 @@
                             }
                         </div>
                     </div>
-                    
                     @if (infoTrademark)
                     {
                     //type of mark
@@ -123,8 +124,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="col form-floating mb-2">
-                                        <InputText @bind-Value="@TrademarkInfo.ClaimColors" placeholder="Claim of Colors (ex. #ffffff, #000000)" class="form-control" id="claimColors" required />
-                                        <label class="ms-2" for="claimColors">Claim of Colors (ex. #ffffff, #000000)</label>
+                                        <InputText @bind-Value="@TrademarkInfo.ClaimColors" placeholder="Claim of Colors" class="form-control" id="claimColors" required />
+                                        <label class="ms-2" for="claimColors">Claim of Colors</label>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -141,29 +142,32 @@
                                 </div>
                                 <div clas="row">
                                     <div class="col">
-
+                                       
                                     </div>
+                                    
                                 </div>
-                                <div class="row ps-3 pe-3">
-                                    <div class="card">
+                                <div class="card shadow">
                                         @if (isChecked)
                                         {
                                             <div class="row p-3">
+                                            <div class="row ps-2 pt-2 form-txt">Claim of Convention Priorities</div>
                                                 <div class="row">
                                                     <div class="form-floating ms-2 me-2 mt-2 form-txt">
-                                                            <SfTextBox Placeholder="Prior Foreign Application No." FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                                                            <SfTextBox Placeholder="Prior Foreign Application No." FloatLabelType="FloatLabelType.Auto" @bind-Value="@CCPInfo.PriorForeignApplicationNo"></SfTextBox>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="form-floating ms-2 me-2 mt-2 form-txt">
-                                                            <SfDatePicker TValue="DateTime?" Placeholder="Foreign Filing Date"></SfDatePicker>
+                                                            <SfDatePicker TValue="DateTime?" Placeholder="Foreign Filing Date" @bind-Value="@CCPInfo.DateValue"></SfDatePicker>
                                                     </div>
                                                 </div>
-                                                <div class="row pt-3">
-                                                    <SfDropDownList TValue="int?" TItem="Countries" Placeholder="Select Country of Residence" DataSource="@countriesinformation" TValueExpression="(Func<Countries, int>)(e => e.Id)"
-                                                                    TextExpression="(Func<Countries, string>)(e => e.countries)" @bind-Value="@CCPInfo.CCPCountry">
-                                                        <DropDownListFieldSettings Text="CountryName" Value="Id"></DropDownListFieldSettings>
-                                                    </SfDropDownList>
+                                                <div class="row">
+                                                    <div class="ms-2 me-2 mt-2 form-txt">
+                                                        <SfDropDownList TValue="int?" TItem="Countries" Placeholder="Select Country of Residence" DataSource="@countriesinformation" TValueExpression="(Func<Countries, int>)(e => e.Id)"
+                                                                        TextExpression="(Func<Countries, string>)(e => e.countries)" @bind-Value="@CCPInfo.CCPCountry">
+                                                            <DropDownListFieldSettings Text="CountryName" Value="Id"></DropDownListFieldSettings>
+                                                        </SfDropDownList>
+                                                    </div>
                                                 </div>
                                             </div>
                                             @foreach (var priority in claimingConventionPriorities)
@@ -195,7 +199,6 @@
                                                 </div>
                                             </div>
                                         }
-                                    </div>
                                 </div>
                             </div>
                         </div> <!--end of Trademark Information-->
@@ -319,15 +322,15 @@
                                         <label for="nameCompanyCorpGovASch">Name of Company / Corporation / Government Agency / School</label>
                                     </div>
                                 </div>
-                                <div class="col-2 mt-2 form-txt/ux wit
-                                    <SfDropDownList TItem="CompanyEntity" TValue="string" Placeholder="Select Company Entity" @bind-Value="@AppInfo.CompanyEntity" DataSource="@companyEntity" style="heigth: 58px;" disabled="@isIndividualSelected">
+                                <div class="col-2 mt-2 form-txt">
+                                    <label class="example-label">Company Entity</label>
+                                    <SfDropDownList TItem="CompanyEntity" TValue="string" Placeholder="Select Company Entity" @bind-Value="@AppInfo.CompanyEntity" DataSource="@companyEntity" style="heugt">
                                         <DropDownListEvents TItem="CompanyEntity" TValue="string"/>
                                         <DropDownListFieldSettings Text="EntityName" Value="ID"/>
                                     </SfDropDownList>
                                 </div>
                             </div>
                             <div class="row pt-1">
-                                <div class="col">Complete Address</div>
                                 <div class="row">
                                     <div class="col-2 form-txt mb-2 mt-2">
                                         <select @onchange="UpdateFilteredStates" class="form-control" style="height: 58px;">
@@ -348,11 +351,11 @@
                                         </select>
                                     </div>
                                     <div class="col-2 form-txt mb-2 mt-2">
-                                        <select class="form-control" style="height: 58px;">
+                                        <select class="form-control" style="height: 58px;" @onchange="UpdateSelectedCity">
                                             <option value="" disabled selected>City</option>
                                             @foreach (var city in filteredCities)
                                             {
-                                                <option class="form-txt">@city.CityName</option>
+                                                <option value="@city.Id"class="form-txt">@city.CityName</option>
                                             }
                                         </select>
                                     </div>
@@ -411,7 +414,7 @@
                                 </div>
                                 <div class="col-4">
                                     <div class="form-floating form-txt mb-2">
-                                        <InputText @bind-Value="@AgentInfo.RAgentPosition" placeholder="Position" class="form-control" id="raPosition" required />
+                                        <InputText @bind-Value="@AgentInfo.RAPosition" placeholder="Position" class="form-control" id="raPosition" required />
                                         <label for="raPosition">Position</label>
                                     </div>
                                 </div>
@@ -447,7 +450,7 @@
                                     {
                                         <div class="row">
                                         <label>
-                                            <input type="radio" name="gender" @bind="@AppInfo.ApplicantGender" />
+                                            <input type="radio" name="gender" @bind="@AgentInfo.RAGender" />
                                             @gender.ToString()
                                         </label>
                                         </div>
@@ -458,7 +461,7 @@
                                 <div class="col">Complete Address</div>
                                 <div class="row">
                                     <div class="col-2 form-txt mb-2 mt-2">
-                                        <select @onchange="UpdateFilteredStates" class="form-control" style="height: 58px;">
+                                        <select @onchange="UpdateFilteredStatesRA" class="form-control" style="height: 58px;">
                                             <option value="" disabled selected>Country</option>
                                             @foreach (var country in countries)
                                             {
@@ -467,7 +470,7 @@
                                         </select>
                                     </div>
                                     <div class="col-2 form-txt mb-2 mt-2">
-                                        <select @onchange="UpdateFilteredCities" class="form-control" style="height: 58px;">
+                                        <select @onchange="UpdateFilteredCitiesRA" class="form-control" style="height: 58px;" >
                                             <option value="" disabled selected>State</option>
                                             @foreach (var state in filteredStates)
                                                 {
@@ -476,11 +479,11 @@
                                         </select>
                                     </div>
                                     <div class="col-2 form-txt mb-2 mt-2">
-                                        <select class="form-control" style="height: 58px;">
+                                    <select class="form-control" style="height: 58px;" @onchange="UpdateSelectedCityRA">
                                             <option value="" disabled selected>City</option>
                                             @foreach (var city in filteredCities)
                                             {
-                                                <option class="form-txt">@city.CityName</option>
+                                                <option value="@city.Id" class="form-txt">@city.CityName</option>
                                             }
                                         </select>
                                     </div>
@@ -671,16 +674,25 @@
     ResidentAgentInformation AgentInfo { get; set; } = new ResidentAgentInformation();
 
 
+
     private async Task SaveInfo()
     {
         // Close the modals
         IsInnerDialogVisible = false;
         IsOuterDialogVisible = false;
 
-        //convert to string
+
+
+        // Convert to string
         TrademarkInfo.MarkType = selectedMarkType.ToString();
 
+        AppInfo.ApplicantCountry = selectedCountryId;
+        AppInfo.ApplicantState = selectedStateId;
+        AppInfo.ApplicantCity = selectedCityId;
 
+        AgentInfo.RACountry = selectedCityIdRA;
+        AgentInfo.RACity = selectedCityIdRA;
+        AgentInfo.RAState = selectedStateIdRA;
 
         // Add the objects to the DbContext
         _dbContext.TrademarkInformation.Add(TrademarkInfo);
@@ -694,16 +706,17 @@
         _dbContext.ApplicantInformation.Add(AppInfo);
         _dbContext.GoodsServicesInformation.Add(GoodsServicesInfo);
 
-        //save changes to the database
+       
+
+        // Save changes to the database
         await _dbContext.SaveChangesAsync();
 
-        //reset the objects for a new entry
+        // Reset the objects for a new entry
         TrademarkInfo = new TrademarkInformation();
         GoodsServicesInfo = new GoodsServicesInformation();
         AppInfo = new ApplicantInformation();
         AgentInfo = new ResidentAgentInformation();
     }
-
 
     private List<Countries> countriesinformation = new List<Countries>();
     private void RetrievedCountries()
@@ -874,13 +887,13 @@
         CCPInfo = new ClaimConventionProperty();
     }
 
-    private void AddBatch()
+    private async Task AddBatch()
     {
         // Add a new ClaimConventionProperty to your list or collection
         claimingConventionPriorities.Add(new ClaimConventionProperty());
 
         // Call the method to store data and reset the form
-        StoreAndResetForm().Wait(); // Waiting for the asynchronous method to complete
+        await StoreAndResetForm(); // Waiting for the asynchronous method to complete
     }
     
 }
@@ -965,13 +978,14 @@
     {
         countries = _countriesrepository.GetCountries();
         UpdateFilteredStates(null); // Fetch states initially
+        UpdateFilteredStatesRA(null); // Fetch states initially
     }
 
     private void UpdateFilteredStates(Microsoft.AspNetCore.Components.ChangeEventArgs e)
     {
         if (e != null)
         {
-            AppInfo.ApplicantCountry = selectedCountryId = Convert.ToInt32(e.Value);
+            selectedCountryId = Convert.ToInt32(e.Value);
         }
         filteredStates = _statesrepository.GetStatesByCountryId(selectedCountryId);
         // Reset selected state and cities when country changes
@@ -984,7 +998,43 @@
         selectedStateId = Convert.ToInt32(e.Value);
         filteredCities = _citiesrepository.GetCitiesByStateId(selectedStateId);
     }
+
+    private int selectedCityId; // Selected city id
+
+    private void UpdateSelectedCity(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        selectedCityId = Convert.ToInt32(e.Value);
+    }
+
 }
 
+@code {
+    private int selectedCountryIdRA; //selected country id
+    private int selectedStateIdRA; //Selected state id
 
-<!--for handling goodsservices-->
+    private void UpdateFilteredStatesRA(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            selectedCountryIdRA = Convert.ToInt32(e.Value);
+        }
+        filteredStates = _statesrepository.GetStatesByCountryId(selectedCountryId);
+        // Reset selected state and cities when country changes
+        selectedStateIdRA = 0;
+        filteredCities = new List<Cities>();
+    }
+
+    private void UpdateFilteredCitiesRA(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        selectedStateIdRA = Convert.ToInt32(e.Value);
+        filteredCities = _citiesrepository.GetCitiesByStateId(selectedStateId);
+    }
+
+    private int selectedCityIdRA; // Selected city id
+
+    private void UpdateSelectedCityRA(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        selectedCityIdRA = Convert.ToInt32(e.Value);
+    }
+
+}

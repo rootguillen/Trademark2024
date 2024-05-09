@@ -20,7 +20,7 @@ namespace Trademark2024.Data
         public int? RANationality { get; set; }
 
         public string? RAgentNum { get; set; }
-        public string? RAgentPosition { get; set; }
+        public string? RAPosition { get; set; }
         public string? FirmLaw {  get; set; }
     }
 }

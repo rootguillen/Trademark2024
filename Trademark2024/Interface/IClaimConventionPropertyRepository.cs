@@ -6,7 +6,7 @@ namespace Trademark2024.Interface
     {
         List<ClaimConventionProperty> GetClaimConventionProperties();
 
-        void UpdateSelectedCountry(int claimConventionPropertyId, int selectedCCPCountryId);
+        
 
     }
 }
